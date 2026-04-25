@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Capstone Cloud App</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap');
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0f1e;
+      --card: #111827;
+      --accent: #00d4ff;
+      --accent2: #7c3aed;
+      --text: #e2e8f0;
+      --muted: #64748b;
+      --success: #10b981;
+      --error: #ef4444;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Syne', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem 1rem;
+    }
+
+    /* Animated background grid */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 700px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 3rem;
+      animation: fadeDown 0.8s ease both;
+    }
+
+    .badge {
+      display: inline-block;
+      background: rgba(0,212,255,0.1);
+      border: 1px solid rgba(0,212,255,0.3);
+      color: var(--accent);
+      font-family: 'Space Mono', monospace;
+      font-size: 0.7rem;
+      padding: 0.3rem 0.8rem;
+      border-radius: 999px;
+      letter-spacing: 0.15em;
+      margin-bottom: 1rem;
+    }
+
+    h1 {
+      font-size: clamp(2rem, 6vw, 3.5rem);
+      font-weight: 800;
+      line-height: 1.1;
+      background: linear-gradient(135deg, #fff 30%, var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 0.75rem;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: 1rem;
+      font-family: 'Space Mono', monospace;
+    }
+
+    /* Status cards */
+    .status-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin-bottom: 2rem;
+      animation: fadeUp 0.8s 0.2s ease both;
+    }
+
+    .status-card {
+      background: var(--card);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 12px;
+      padding: 1rem;
+      text-align: center;
+    }
+
+    .status-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--success);
+      display: inline-block;
+      margin-right: 6px;
+      animation: pulse 2s infinite;
+    }
+
+    .status-label {
+      font-size: 0.65rem;
+      color: var(--muted);
+      font-family: 'Space Mono', monospace;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 0.3rem;
+    }
+
+    .status-value {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--success);
+    }
+
+    /* Main form card */
+    .card {
+      background: var(--card);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 20px;
+      padding: 2rem;
+      margin-bottom: 1.5rem;
+      animation: fadeUp 0.8s 0.3s ease both;
+    }
+
+    .card h2 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 0.4rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .card p {
+      color: var(--muted);
+      font-size: 0.85rem;
+      font-family: 'Space Mono', monospace;
+      margin-bottom: 1.5rem;
+    }
+
+    .field {
+      margin-bottom: 1rem;
+    }
+
+    label {
+      display: block;
+      font-size: 0.75rem;
+      font-family: 'Space Mono', monospace;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 0.4rem;
+    }
+
+    input, textarea {
+      width: 100%;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 10px;
+      padding: 0.75rem 1rem;
+      color: var(--text);
+      font-family: 'Space Mono', monospace;
+      font-size: 0.85rem;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    input:focus, textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(0,212,255,0.1);
+    }
+
+    textarea { resize: vertical; min-height: 80px; }
+
+    button {
+      width: 100%;
+      padding: 0.85rem;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border: none;
+      border-radius: 10px;
+      color: #fff;
+      font-family: 'Syne', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s;
+      margin-top: 0.5rem;
+    }
+
+    button:hover { opacity: 0.9; transform: translateY(-1px); }
+    button:active { transform: translateY(0); }
+    button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+    /* Response box */
+    #response-box {
+      display: none;
+      background: rgba(16,185,129,0.07);
+      border: 1px solid rgba(16,185,129,0.25);
+      border-radius: 12px;
+      padding: 1rem 1.25rem;
+      margin-top: 1rem;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.8rem;
+    }
+
+    #response-box.error {
+      background: rgba(239,68,68,0.07);
+      border-color: rgba(239,68,68,0.25);
+      color: var(--error);
+    }
+
+    #response-box.success { color: var(--success); }
+
+    /* Architecture diagram */
+    .arch {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      padding: 1.5rem;
+      background: var(--card);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 20px;
+      animation: fadeUp 0.8s 0.4s ease both;
+    }
+
+    .arch-node {
+      background: rgba(0,212,255,0.08);
+      border: 1px solid rgba(0,212,255,0.2);
+      border-radius: 10px;
+      padding: 0.5rem 0.9rem;
+      font-size: 0.72rem;
+      font-family: 'Space Mono', monospace;
+      text-align: center;
+      color: var(--accent);
+    }
+
+    .arch-node span { display: block; font-size: 1.1rem; margin-bottom: 2px; }
+    .arch-arrow { color: var(--muted); font-size: 1.2rem; }
+
+    footer {
+      text-align: center;
+      margin-top: 2.5rem;
+      color: var(--muted);
+      font-family: 'Space Mono', monospace;
+      font-size: 0.7rem;
+      animation: fadeUp 0.8s 0.5s ease both;
+    }
+
+    @keyframes fadeDown { from { opacity:0; transform:translateY(-20px); } to { opacity:1; transform:none; } }
+    @keyframes fadeUp   { from { opacity:0; transform:translateY(20px);  } to { opacity:1; transform:none; } }
+    @keyframes pulse    { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <header>
+      <div class="badge">🚀 ECS FARGATE · RUNNING</div>
+      <h1>Cloud Native<br/>Capstone App</h1>
+      <p class="subtitle">Containerized on Amazon ECS &amp; Powered by AWS Lambda</p>
+    </header>
+
+    <!-- Status cards -->
+    <div class="status-grid">
+      <div class="status-card">
+        <div class="status-label">Container</div>
+        <div class="status-value"><span class="status-dot"></span>Online</div>
+      </div>
+      <div class="status-card">
+        <div class="status-label">API</div>
+        <div class="status-value"><span class="status-dot"></span>Ready</div>
+      </div>
+      <div class="status-card">
+        <div class="status-label">CloudWatch</div>
+        <div class="status-value"><span class="status-dot"></span>Logging</div>
+      </div>
+    </div>
+
+    <!-- Form card -->
+    <div class="card">
+      <h2>📡 Submit Data to Lambda API</h2>
+      <p>POST request → API Gateway → Lambda → CloudWatch Logs</p>
+
+      <div class="field">
+        <label>Your Name</label>
+        <input type="text" id="name" placeholder="e.g. Jane Doe" />
+      </div>
+      <div class="field">
+        <label>Message / Data Payload</label>
+        <textarea id="message" placeholder="Enter any message to send to the Lambda function..."></textarea>
+      </div>
+
+      <button id="submit-btn" onclick="submitData()">Send to Lambda →</button>
+
+      <div id="response-box"></div>
+    </div>
+
+    <!-- Architecture -->
+    <div class="arch">
+      <div class="arch-node"><span>🌐</span>Browser</div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-node"><span>🚪</span>API Gateway</div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-node"><span>λ</span>Lambda</div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-node"><span>📊</span>CloudWatch</div>
+    </div>
+
+    <footer>
+      <p>Deployed via AWS CloudFormation · ECS Fargate · Nginx Alpine</p>
+      <p style="margin-top:0.4rem">Capstone Project · DevOps Foundations</p>
+    </footer>
+  </div>
+
+  <script>
+    // ⚠️ Replace this URL with your actual API Gateway endpoint after deployment
+    const API_URL = "YOUR_API_GATEWAY_URL_HERE/submit";
+
+    async function submitData() {
+      const name = document.getElementById("name").value.trim();
+      const message = document.getElementById("message").value.trim();
+      const btn = document.getElementById("submit-btn");
+      const box = document.getElementById("response-box");
+
+      if (!name || !message) {
+        showResponse("⚠️ Please fill in both fields.", "error");
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = "Sending...";
+      box.style.display = "none";
+
+      const payload = { name, message, timestamp: new Date().toISOString() };
+
+      try {
+        const res = await fetch(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        showResponse(`✅ Success! ID: ${data.id}\n${data.message}`, "success");
+      } catch (err) {
+        showResponse(`❌ Error: ${err.message}\n\nMake sure to replace API_URL in index.html with your real API Gateway URL.`, "error");
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "Send to Lambda →";
+      }
+    }
+
+    function showResponse(text, type) {
+      const box = document.getElementById("response-box");
+      box.textContent = text;
+      box.className = type;
+      box.style.display = "block";
+    }
+  </script>
+</body>
+</html>

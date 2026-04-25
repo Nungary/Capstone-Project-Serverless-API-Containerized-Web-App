@@ -1,0 +1,39 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: ECS Fargate Deployment for Capstone App
+
+Resources:
+
+  MyECSCluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: CapstoneCluster
+
+  MyTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      RequiresCompatibilities:
+        - FARGATE
+      NetworkMode: awsvpc
+      Cpu: 256
+      Memory: 512
+      ExecutionRoleArn: arn:aws:iam::430287290736:role/ecsTaskExecutionRole
+      ContainerDefinitions:
+        - Name: webapp-container
+          Image: 430287290736.dkr.ecr.us-east-1.amazonaws.com/capstone-project-1-serverless-api:latest
+          PortMappings:
+            - ContainerPort: 80
+
+  MyECSService:
+    Type: AWS::ECS::Service
+    Properties:
+      Cluster: !Ref MyECSCluster
+      TaskDefinition: !Ref MyTaskDefinition
+      DesiredCount: 1
+      LaunchType: FARGATE
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          Subnets:
+            - subnet-01e9d63535917a57e
+          SecurityGroups:
+            - sg-079abb3ef64cf92b5
